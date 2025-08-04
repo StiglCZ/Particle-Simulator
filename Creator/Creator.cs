@@ -11,6 +11,7 @@ class Creator {
     SourceSaver Saver;
     const int Width = 800;
     const int Height = 600;
+    const int TextSize = 25;
 
     const float LineSidesWidth = 15.0f;
     const float CursorWidth = 7.0f;
@@ -38,7 +39,24 @@ class Creator {
     Particle? tempParticle = null; 
 
     private void DrawConfiguration() {
+        if(!DisplayConfiguration ||
+           SelectedType == null)
+            return;
+
+        Rectangle
+            mainRect = new Rectangle(Vector2.Zero, 200, Height);
+        Raylib.DrawRectangleRec(mainRect, Color.DarkGray);
         
+        if(SelectedType == Selected.Line) {
+            Raylib.DrawText("Line Config", 0, 0, TextSize, Color.SkyBlue);
+            
+            // Configure color
+            
+        } else {
+            Raylib.DrawText("Particle Config", 0, 0, TextSize, Color.SkyBlue);
+
+            // Configure everything else
+        }
     }
     
     private void DrawMenuButton() {
@@ -46,7 +64,7 @@ class Creator {
 
         Raylib.DrawRectangleV(MenuButtonRect.Position, MenuButtonRect.Size, Color.Black);
         Raylib.DrawRectangleLinesEx(MenuButtonRect, 4.0f, Color.LightGray);
-        Raylib.DrawText("Config", 5, 5, 25, Color.White);
+        Raylib.DrawText("Config", 5, 5, TextSize, Color.White);
     }
     
     private void Draw() {
@@ -71,7 +89,22 @@ class Creator {
             Raylib.DrawCircleV(tempParticle.Position, tempParticle.Radius, tempParticle.c);
         }
 
+        if(SelectedType != null) {
+            if(SelectedType == Selected.Particle) {
+                Particle particle = Particles[SelectedElement];
+                Raylib.DrawCircleLinesV(particle.Position, particle.Radius, Color.White);
+            } else if(SelectedType == Selected.Line) {
+                int Point = SelectedElement & 0x01;
+                Line line = Lines[(SelectedElement - Point) / 2];
+                //if(Point == 0) Raylib.DrawCircleLinesV(line.a, LineSidesWidth, Color.Red);
+                //else Raylib.DrawCircleLinesV(line.b, LineSidesWidth, Color.Red);
+                Raylib.DrawCircleLinesV(line.a, LineSidesWidth, Color.Red);
+                Raylib.DrawCircleLinesV(line.b, LineSidesWidth, Color.Red);
+            }
+        }
+
         DrawMenuButton();
+        DrawConfiguration();
 
         Raylib.EndDrawing();
     }
@@ -128,6 +161,8 @@ class Creator {
     }
 
     private void LHeld() {
+        if(DisplayConfiguration) return;
+        
         LClickSpan += Raylib.GetFrameTime();
         CurrMousePos = Raylib.GetMousePosition();
 
