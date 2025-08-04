@@ -19,6 +19,10 @@ class Creator {
     List<Line> Lines;
     List<Particle> Particles;
 
+    Rectangle MenuButtonRect = new Rectangle(0, 0, 100, 40);
+
+    bool DisplayConfiguration = false;
+
     Selected? SelectedType = null;
     int SelectedElement = 0;
     
@@ -32,6 +36,18 @@ class Creator {
     // Before it gets pushed to the main list
     Line? tempLine = null;
     Particle? tempParticle = null; 
+
+    private void DrawConfiguration() {
+        
+    }
+    
+    private void DrawMenuButton() {
+        if(SelectedType == null || DisplayConfiguration) return;
+
+        Raylib.DrawRectangleV(MenuButtonRect.Position, MenuButtonRect.Size, Color.Black);
+        Raylib.DrawRectangleLinesEx(MenuButtonRect, 4.0f, Color.LightGray);
+        Raylib.DrawText("Config", 5, 5, 25, Color.White);
+    }
     
     private void Draw() {
         Raylib.BeginDrawing();
@@ -54,7 +70,9 @@ class Creator {
         } else if(tempParticle != null) {
             Raylib.DrawCircleV(tempParticle.Position, tempParticle.Radius, tempParticle.c);
         }
-        
+
+        DrawMenuButton();
+
         Raylib.EndDrawing();
     }
 
@@ -69,9 +87,19 @@ class Creator {
             Saver.Save(Source.FullName);
         }
     }
-
+    
     private void LPressed() {
-        CurrMousePos = OrigMousePos = Raylib.GetMousePosition();
+        Vector2 MousePosition = Raylib.GetMousePosition();
+        // TODO: Check if not in menu!!! return
+        if(DisplayConfiguration) return; // Handle elsewhere
+        if(SelectedType != null && MousePosition.X < 100) {
+            DisplayConfiguration = true;
+            return;
+        }
+
+        SelectedType = null;
+        SelectedElement = 0;
+        CurrMousePos = OrigMousePos = MousePosition;
             
         for(int i =0; i < Lines.Count && SelectedType == null; i++) {
             Line line = Lines[i];
@@ -112,6 +140,12 @@ class Creator {
             else line.b = CurrMousePos;
         }
     }
+
+    private void LReleased() {
+        LClickSpan = 0;
+        OrigMousePos = Vector2.Zero;
+        CurrMousePos = Vector2.Zero;
+    }
     
     private void HandleLeftClick() {
         if(Raylib.IsMouseButtonPressed(MouseButton.Left)) {
@@ -119,11 +153,7 @@ class Creator {
         } else if(Raylib.IsMouseButtonDown(MouseButton.Left)) {
             LHeld();
         } else if(Raylib.IsMouseButtonReleased(MouseButton.Left)){
-            SelectedType = null;
-            SelectedElement = 0;
-            LClickSpan = 0;
-            OrigMousePos = Vector2.Zero;
-            CurrMousePos = Vector2.Zero;
+            LReleased();
         }
     }
 
