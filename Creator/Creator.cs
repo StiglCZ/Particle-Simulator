@@ -38,14 +38,13 @@ class Creator {
     Line? tempLine = null;
     Particle? tempParticle = null;
 
-    private void DrawColorPicker(Vector2 Position, ref Color c) {
+    private void DrawColorPicker(Vector2 Position, Vector2 MousePosition, ref Color c) {
         Vector2 Size = new Vector2(140, 150),
             SegmentSize = new Vector2(40, 140),
             SegmentOffset = new Vector2(5, 5);
         float SegmentSizeWithOffsetX = SegmentSize.X + SegmentOffset.X;
         
         Raylib.DrawRectangleV(Position, Size, Color.Black);
-        Raylib.DrawText("Change color:", (int)Position.X, (int)Position.Y - 15, 15, Color.White);
 
         Vector2 Segment1 = Position + SegmentOffset + Vector2.UnitX * SegmentSizeWithOffsetX * 0;
         Raylib.DrawRectangleGradientV((int)Segment1.X, (int)Segment1.Y, (int)SegmentSize.X,
@@ -69,8 +68,6 @@ class Creator {
         Raylib.DrawRectangleV(Segment3 + Vector2.UnitY * PosB, SelectionSize, Color.White);
         
         if(Raylib.IsMouseButtonDown(MouseButton.Left)) {
-            Vector2 MousePosition = Raylib.GetMousePosition();
-
             Vector2 v1 = MousePosition - Segment1,
                 v2 = MousePosition - Segment2,
                 v3 = MousePosition - Segment3;
@@ -83,31 +80,101 @@ class Creator {
 
             if(v3.X < SegmentSize.X && v3.Y < SegmentSize.Y && 0 < v3.X && 0 < v3.Y)
                 c.B = (byte)(255.0f - (v3.Y / SegmentSize.Y * 255.0f));
-            
         }
     }
+
+    Vector2 ConfSize = new Vector2(200, Height);
     
     private void DrawConfiguration() {
         if(!DisplayConfiguration ||
            SelectedType == null)
             return;
 
+        Vector2 MousePosition = Raylib.GetMousePosition();
         Rectangle
-            mainRect = new Rectangle(Vector2.Zero, 200, Height);
+            mainRect = new Rectangle(Vector2.Zero, ConfSize);
         Raylib.DrawRectangleRec(mainRect, Color.DarkGray);
 
         if(SelectedType == Selected.Line) {
             Raylib.DrawText("Line Config", 0, 0, TextSize, Color.SkyBlue);
             // Do not use CsLo, too complex
 
-            DrawColorPicker(new Vector2(20, 50), ref Lines[SelectedElement / 2].c);
+            DrawColorPicker(new Vector2(20, 50), MousePosition, ref Lines[SelectedElement / 2].c);
             //var v = mainRect.ToString().SelectMany(x => new string[] { x.ToString().ToLower(), x.ToString().ToUpper() });
             // Configure color
 
         } else {
+            Particle p = Particles[SelectedElement];
             Raylib.DrawText("Particle Config", 0, 0, TextSize, Color.SkyBlue);
+            Raylib.DrawText("Change color:", 0, 30, TextSize, Color.White);
+            DrawColorPicker(new Vector2(20, 60), MousePosition, ref Particles[SelectedElement].c);
+            Raylib.DrawText($"Radius: {p.Radius}", 0, 220, TextSize, Color.White);
+            Raylib.DrawText($"Interacts w.:", 0, 250, TextSize, Color.White);
 
-            // Configure everything else
+            Rectangle
+                chBox1 = new Rectangle(100, 280, 20, 20),
+                chBox2 = new Rectangle(100, 300, 20, 20);
+            Raylib.DrawText($"Lines:", 20, 280, TextSize - 5, Color.White);
+            Raylib.DrawRectangleLinesEx(chBox1, 3.0f, Color.White);
+            if(p.WallsInteract) {
+                Raylib.DrawLineEx(chBox1.Position,
+                                  chBox1.Position + chBox1.Size,
+                                  3.0f, Color.White);
+                Raylib.DrawLineEx(chBox1.Position + Vector2.UnitX * chBox1.Size.X,
+                                  chBox1.Position + chBox1.Size - Vector2.UnitX * chBox1.Size.Y,
+                                  3.0f, Color.White);
+            }
+            
+            
+                
+            Raylib.DrawText($"Others:", 20, 300, TextSize - 5, Color.White);
+            Raylib.DrawRectangleLinesEx(chBox2, 3.0f, Color.White);
+
+            if(p.OthersInteract) {
+                Raylib.DrawLineEx(chBox2.Position,
+                                  chBox2.Position + chBox2.Size,
+                                  3.0f, Color.White);
+                Raylib.DrawLineEx(chBox2.Position + Vector2.UnitX * chBox2.Size.X,
+                                  chBox2.Position + chBox2.Size - Vector2.UnitX * chBox2.Size.Y,
+                                  3.0f, Color.White);
+            }
+            
+            if(Raylib.IsMouseButtonPressed(MouseButton.Left)) {
+                if(Raylib.CheckCollisionPointRec(MousePosition, chBox2))
+                    p.OthersInteract = !p.OthersInteract;
+                if(Raylib.CheckCollisionPointRec(MousePosition, chBox1))
+                    p.WallsInteract = !p.WallsInteract;
+            }
+
+            float velRadius = 85;
+            Vector2 velCircle = new Vector2(100, 450);
+            Vector2 up = Vector2.UnitY, le = Vector2.UnitX;
+
+            Raylib.DrawText($"Velocity:", 0, 325, TextSize, Color.White);
+            
+            Raylib.DrawCircleV(velCircle, velRadius, Color.Gray);
+            Raylib.DrawLineV(velCircle - up * velRadius, velCircle + up * velRadius, Color.White);
+            Raylib.DrawLineV(velCircle - le * velRadius, velCircle + le * velRadius, Color.White);
+
+            Vector2 Button = new Vector2(velCircle.X - 25, velCircle.Y + 95);
+            Raylib.DrawRectangleV(Button, new Vector2(50, 20), Color.SkyBlue);
+            Raylib.DrawText("Zero", (int)Button.X, (int)Button.Y, 15, Color.White);
+
+            Raylib.DrawCircleV(velCircle + p.Velocity, 5.0f, Color.White);
+            if(Raylib.IsMouseButtonPressed(MouseButton.Left)) {
+                if(Raylib.CheckCollisionPointCircle(MousePosition, velCircle, velRadius)) {
+                    
+                }
+                
+                if(Raylib.CheckCollisionPointRec(MousePosition, new Rectangle(Button, new Vector2(50, 20)))) {
+                    p.Velocity = Vector2.Zero;
+                }
+            }
+
+            
+
+            //Configure: p.Velocity
+
         }
     }
 
@@ -176,7 +243,11 @@ class Creator {
     private void LPressed() {
         Vector2 MousePosition = Raylib.GetMousePosition();
         // TODO: Check if not in menu!!! return
-        if(DisplayConfiguration) return; // Handle elsewhere
+        if(DisplayConfiguration) {
+            if (MousePosition.X > ConfSize.X || MousePosition.Y > ConfSize.Y) {
+                DisplayConfiguration = false;
+            }else return; // Handle elsewhere
+        } 
         if(SelectedType != null && MousePosition.X < 100) {
             DisplayConfiguration = true;
             return;
@@ -290,6 +361,9 @@ class Creator {
         HandleCheckSave();
         HandleLeftClick();
         HandleRightClick();
+
+        if(SelectedType == Selected.Particle)
+            Particles[SelectedElement].Radius += Raylib.GetMouseWheelMove();
     }
 
     public void Run() {
