@@ -160,21 +160,17 @@ class Creator {
             Raylib.DrawRectangleV(Button, new Vector2(50, 20), Color.SkyBlue);
             Raylib.DrawText("Zero", (int)Button.X, (int)Button.Y, 15, Color.White);
 
-            Raylib.DrawCircleV(velCircle + p.Velocity, 5.0f, Color.White);
+            Raylib.DrawCircleV(velCircle + p.Velocity * 10, 5.0f, Color.White);
             if(Raylib.IsMouseButtonPressed(MouseButton.Left)) {
                 if(Raylib.CheckCollisionPointCircle(MousePosition, velCircle, velRadius)) {
-                    
+                    p.Velocity = (MousePosition - velCircle) / 10;
                 }
                 
                 if(Raylib.CheckCollisionPointRec(MousePosition, new Rectangle(Button, new Vector2(50, 20)))) {
                     p.Velocity = Vector2.Zero;
                 }
             }
-
-            
-
-            //Configure: p.Velocity
-
+            Raylib.DrawText(p.Velocity.ToString("00.000"), 0, (int)Button.Y + 30, TextSize - 5, Color.White);
         }
     }
 
