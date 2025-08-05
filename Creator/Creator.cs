@@ -161,7 +161,7 @@ class Creator {
             Raylib.DrawText("Zero", (int)Button.X, (int)Button.Y, 15, Color.White);
 
             Raylib.DrawCircleV(velCircle + p.Velocity * 10, 5.0f, Color.White);
-            if(Raylib.IsMouseButtonPressed(MouseButton.Left)) {
+            if(Raylib.IsMouseButtonDown(MouseButton.Left)) {
                 if(Raylib.CheckCollisionPointCircle(MousePosition, velCircle, velRadius)) {
                     p.Velocity = (MousePosition - velCircle) / 10;
                 }
@@ -260,12 +260,16 @@ class Creator {
                 SelectedElement = i * 2;
                 SelectedType = Selected.Line;
                 Raylib.SetMousePosition((int)line.a.X, (int)line.a.Y);
+                
+                OrigMousePos = line.a;
             }
 
             if(Raylib.CheckCollisionCircles(OrigMousePos, CursorWidth, line.b, LineSidesWidth)) {
                 SelectedElement = i * 2 + 1;
                 SelectedType = Selected.Line;
                 Raylib.SetMousePosition((int)line.b.X, (int)line.b.Y);
+                
+                OrigMousePos = line.b;
             }
         }
 
@@ -275,6 +279,8 @@ class Creator {
                 SelectedElement = i;
                 SelectedType = Selected.Particle;
                 Raylib.SetMousePosition((int)particle.Position.X, (int)particle.Position.Y);
+                
+                OrigMousePos = particle.Position;
             }
         }
     }
@@ -297,6 +303,11 @@ class Creator {
 
     private void LReleased() {
         LClickSpan = 0;
+        if((OrigMousePos - CurrMousePos).Length() < 20) {
+            DisplayConfiguration = true;
+            return;
+        }
+            
         OrigMousePos = Vector2.Zero;
         CurrMousePos = Vector2.Zero;
     }
