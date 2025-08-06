@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-struct SourceTuple {
+public struct SourceTuple {
     public List<Line> Lines;
     public List<Particle> Particles;
     public SourceTuple() {
@@ -10,17 +10,17 @@ struct SourceTuple {
     }
 }
 
-interface SourceSaver {
+public interface SourceSaver {
     public SourceTuple Value { protected get; set; }
     public void Save(string FileSource);
 }
 
-interface SourceLoader {
+public interface SourceLoader {
     public SourceTuple Value { get; protected set; }
     public SourceTuple Load(string FileSource);
 }
 
-class JsonSourceLoader : SourceLoader {
+public class JsonSourceLoader : SourceLoader {
     public SourceTuple Value { get; set; }
     public SourceTuple Load(string FileSource) {
         try {
@@ -37,7 +37,7 @@ class JsonSourceLoader : SourceLoader {
     }
 }
 
-class JsonSourceSaver : SourceSaver {
+public class JsonSourceSaver : SourceSaver {
     public SourceTuple Value { get; set; }
     public void Save(string FileSource) {
         StreamWriter writer = new StreamWriter(FileSource, false, Encoding.UTF8);

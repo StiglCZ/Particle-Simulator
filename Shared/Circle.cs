@@ -3,7 +3,7 @@ using System.Numerics;
 // For Color
 using Raylib_cs;
 
-class Particle {
+public class Particle {
     public Vector2 Position, Velocity;
     public float Radius;
     public Color c;

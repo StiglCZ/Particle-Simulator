@@ -2,7 +2,7 @@
 using Raylib_cs;
 using System.Numerics;
 
-class Line {
+public class Line {
     public Vector2 a;
     public Vector2 b;
     public float Len { get { return Vector2.Distance(a, b); } }
