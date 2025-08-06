@@ -22,6 +22,15 @@ class Particle {
         this.c = color ?? Color.White;
     }
 
+    public Particle(Particle particle) {
+        this.Position = particle.Position;
+        this.Velocity = particle.Velocity;
+        this.Radius = particle.Radius;
+        this.c = particle.c;
+        this.OthersInteract = particle.OthersInteract;
+        this.WallsInteract = particle.WallsInteract;
+    }
+
     [System.Text.Json.Serialization.JsonConstructor]
     public Particle() {
         

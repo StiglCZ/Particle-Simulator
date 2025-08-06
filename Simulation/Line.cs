@@ -26,8 +26,17 @@ class Line {
         this.b = Vector2.Zero;
         this.c = c;
     }
-    
+
+    public Line(Line line) {
+        this.a = line.a;
+        this.b = line.b;
+        this.c = line.c;
+    }
+
     [System.Text.Json.Serialization.JsonConstructor]
     public Line() {
+        this.a = Vector2.Zero;
+        this.b = Vector2.Zero;
+        this.c = Color.White;
     }
 }

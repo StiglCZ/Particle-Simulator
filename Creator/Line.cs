@@ -32,7 +32,8 @@ class Line {
         this.b = line.b;
         this.c = line.c;
     }
-    
+
+    [System.Text.Json.Serialization.JsonConstructor]
     public Line() {
         this.a = Vector2.Zero;
         this.b = Vector2.Zero;
