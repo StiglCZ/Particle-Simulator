@@ -21,7 +21,7 @@ class Simulation {
 
         Raylib.EndDrawing();
     }
-
+    
     private void Update() {
         foreach (Particle part in Particles) {
             Parallel.ForEach<Particle>(Particles, part2 => {
@@ -36,7 +36,7 @@ class Simulation {
                 float VelocityNormal =
                     + RelativeVelocity.X * DistanceNormal.X
                     + RelativeVelocity.Y * DistanceNormal.Y;
-
+                if(VelocityNormal > 0) return; // Not going towards eachother
                 const float e = 1.00f;
                 float k = -(1 + e) * VelocityNormal / (1 / part.Radius + 1 / part2.Radius);
 
